@@ -6,7 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
-input_path = "backend/data/ml_ready"
+# input_path = "backend/data/ml_ready"
+input_path = "backend/data/ml_enhanced"
 model_path = "backend/models"
 os.makedirs(model_path, exist_ok=True)
 
@@ -14,7 +15,8 @@ results = []
 
 for file in os.listdir(input_path):
     df = pd.read_csv(os.path.join(input_path, file))
-    df = df.drop(columns=["date"])
+    # df = df.drop(columns=["date"])
+    df = df.drop(columns=["date", "open", "high", "low", "close"])
 
     X = df.drop(columns=["target"])
     y = df["target"]

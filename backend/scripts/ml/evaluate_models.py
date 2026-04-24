@@ -6,7 +6,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
-input_path = "backend/data/ml_ready"
+# input_path = "backend/data/ml_ready"
+input_path = "backend/data/ml_enhanced"
 
 def evaluate(name, y_true, y_pred):
     print(f"\n{name}")
@@ -17,7 +18,8 @@ def evaluate(name, y_true, y_pred):
 
 for file in os.listdir(input_path):
     df = pd.read_csv(os.path.join(input_path, file))
-    df = df.drop(columns=["date"])
+    # df = df.drop(columns=["date"])
+    df = df.drop(columns=["date", "open", "high", "low", "close"])
 
     X = df.drop(columns=["target"])
     y = df["target"]
