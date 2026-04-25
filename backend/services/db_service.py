@@ -107,3 +107,26 @@ def get_recent(limit=10):
     ).limit(limit).all()
 
     return [r.to_dict() for r in records]
+
+def get_analytics():
+    total = Prediction.query.count()
+    
+    if total == 0:
+        return {
+            "total_predictions": 0,
+            "up_predictions": 0,
+            "down_predictions": 0,
+            "avg_confidence": 0
+        }
+
+    up = Prediction.query.filter_by(prediction="UP").count()
+    down = Prediction.query.filter_by(prediction="DOWN").count()
+
+    avg_conf = db.session.query(func.avg(Prediction.confidence)).scalar()
+
+    return {
+        "total_predictions": total,
+        "up_predictions": up,
+        "down_predictions": down,
+        "avg_confidence": round(avg_conf or 0, 4)
+    }
