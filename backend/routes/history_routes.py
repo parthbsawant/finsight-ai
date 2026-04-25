@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from services.db_service import get_all_history
-
+# from services.db_service import get_all_history
+from backend.services.db_service import get_all_history
 history_bp = Blueprint("history", __name__)
 
 @history_bp.route("/history", methods=["GET"])

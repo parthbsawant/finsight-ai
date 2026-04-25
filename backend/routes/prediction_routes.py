@@ -1,12 +1,16 @@
 from flask import Blueprint, jsonify
 import pandas as pd
 
-from services.data_service import get_stock_data
-from services.model_service import load_model, predict
-from services.explain_service import generate_explanation
+# from services.data_service import get_stock_data
+# from services.model_service import load_model, predict
+# from services.explain_service import generate_explanation
+# from services.db_service import save_prediction
+from backend.services.data_service import get_stock_data
+from backend.services.model_service import load_model, predict
+from backend.services.explain_service import generate_explanation
+from backend.services.db_service import save_prediction
+from backend.models.db_models import Prediction, db
 
-from models.db_models import db, Prediction
-from services.db_service import save_prediction
 
 prediction_bp = Blueprint("prediction", __name__)
 

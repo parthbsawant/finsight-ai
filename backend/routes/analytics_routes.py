@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify
 from models.db_models import Prediction, db
 from sqlalchemy import func
-from services.db_service import get_basic_analytics
-
+# from services.db_service import get_basic_analytics
+from backend.services.db_service import get_analytics
 analytics_bp = Blueprint("analytics", __name__)
 
 @analytics_bp.route("/analytics", methods=["GET"])

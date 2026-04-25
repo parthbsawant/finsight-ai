@@ -1,10 +1,17 @@
 from flask import Blueprint, jsonify
 from models.db_models import Prediction, db
 from sqlalchemy import func
-from services.db_service import (
+# from services.db_service import (
+#     get_stock_analytics,
+#     get_trends,
+#     get_recent
+# )
+
+from backend.services.db_service import (
+    get_summary,
     get_stock_analytics,
     get_trends,
-    get_recent
+    get_recent_predictions
 )
 
 advanced_analytics_bp = Blueprint("advanced_analytics", __name__)

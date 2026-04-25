@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from services.data_service import get_stock_data
-
+# from services.data_service import get_stock_data
+from backend.services.data_service import get_stock_data
 stock_bp = Blueprint("stock", __name__)
 
 @stock_bp.route("/stock/<symbol>", methods=["GET"])

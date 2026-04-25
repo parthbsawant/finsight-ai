@@ -2,13 +2,19 @@ from flask import Flask
 from flask_cors import CORS
 # from config import Config
 from backend.config import Config
-from models.db_models import db
+# from models.db_models import db
+from backend.models.db_models import db
 
-from routes.stock_routes import stock_bp
-from routes.prediction_routes import prediction_bp
-from routes.history_routes import history_bp
-from routes.analytics_routes import analytics_bp
-from routes.advanced_analytics_routes import advanced_analytics_bp
+# from routes.stock_routes import stock_bp
+# from routes.prediction_routes import prediction_bp
+# from routes.history_routes import history_bp
+# from routes.analytics_routes import analytics_bp
+# from routes.advanced_analytics_routes import advanced_analytics_bp
+from backend.routes.stock_routes import stock_bp
+from backend.routes.prediction_routes import prediction_bp
+from backend.routes.history_routes import history_bp
+from backend.routes.analytics_routes import analytics_bp
+from backend.routes.advanced_analytics_routes import advanced_analytics_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
