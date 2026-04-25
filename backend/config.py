@@ -11,5 +11,6 @@ class Config:
     # Database (future use)
     DB_PATH = os.path.join(BASE_DIR, "database.db")
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     DEBUG = True
