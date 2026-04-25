@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models.db_models import Prediction, db
+from backend.models.db_models import Prediction, db
 from sqlalchemy import func
 # from services.db_service import get_basic_analytics
 from backend.services.db_service import get_analytics
