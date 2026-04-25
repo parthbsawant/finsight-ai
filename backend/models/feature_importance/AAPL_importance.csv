@@ -1,0 +1,15 @@
+feature,importance
+close,0.09680546
+open,0.09207251
+low,0.08377905
+sentiment_score,0.08107891
+high,0.080144346
+sentiment_ma_3,0.07839365
+rsi,0.074710116
+returns_lag_1,0.0736871
+macd,0.06996668
+returns,0.068059
+volume,0.067460835
+volatility,0.067057274
+sentiment_lag_1,0.06678497
+news_count,0.0
