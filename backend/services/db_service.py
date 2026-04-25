@@ -1,4 +1,4 @@
-from models.db_models import db, Prediction
+from backend.models.db_models import db, Prediction
 from sqlalchemy import func
 
 
