@@ -7,7 +7,7 @@ import { auth } from '../utils/auth';
 const Sidebar = () => {
   const navigate = useNavigate();
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={20} /> },
     { name: 'Analytics', path: '/analytics', icon: <Activity size={20} /> },
     { name: 'History', path: '/history', icon: <History size={20} /> },
     { name: 'Markets', path: '/stock/AAPL', icon: <LineChart size={20} /> },

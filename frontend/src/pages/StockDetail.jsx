@@ -183,7 +183,7 @@ const StockDetail = () => {
           )}
           
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="w-full py-4 bg-white hover:bg-slate-50 border-2 border-brand-blue text-brand-blue font-bold rounded-xl transition-all shadow-sm active:scale-[0.98]"
           >
             Run AI Prediction

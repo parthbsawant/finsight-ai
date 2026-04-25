@@ -22,7 +22,7 @@ const Login = () => {
 
     try {
       auth.login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     }
