@@ -5,6 +5,8 @@ from models.db_models import db
 
 from routes.stock_routes import stock_bp
 from routes.prediction_routes import prediction_bp
+from routes.history_routes import history_bp
+from routes.analytics_routes import analytics_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -18,6 +20,8 @@ CORS(app)
 
 app.register_blueprint(stock_bp)
 app.register_blueprint(prediction_bp)
+app.register_blueprint(history_bp)
+app.register_blueprint(analytics_bp)
 
 @app.route("/")
 def home():
