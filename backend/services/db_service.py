@@ -101,7 +101,16 @@ def get_trends():
     ]
 
 
+# def get_recent(limit=10):
+#     records = Prediction.query.order_by(
+#         Prediction.created_at.desc()
+#     ).limit(limit).all()
+
+#     return [r.to_dict() for r in records]
+
 def get_recent(limit=10):
+    limit = max(1, min(limit, 100))  # prevent abuse
+
     records = Prediction.query.order_by(
         Prediction.created_at.desc()
     ).limit(limit).all()
@@ -130,3 +139,6 @@ def get_analytics():
         "down_predictions": down,
         "avg_confidence": round(avg_conf or 0, 4)
     }
+
+def get_summary():
+    return {"message": "summary placeholder"}

@@ -11,7 +11,7 @@ from backend.services.db_service import (
     get_summary,
     get_stock_analytics,
     get_trends,
-    get_recent_predictions
+    get_recent
 )
 
 advanced_analytics_bp = Blueprint("advanced_analytics", __name__)

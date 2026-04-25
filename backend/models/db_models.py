@@ -28,5 +28,5 @@ class Prediction(db.Model):
             "volatility": self.volatility,
             "sentiment_score": self.sentiment_score,
             "news_count": self.news_count,
-            "created_at": self.created_at
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
