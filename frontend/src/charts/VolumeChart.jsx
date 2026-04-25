@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { createChart } from 'lightweight-charts';
+import * as LightweightCharts from 'lightweight-charts';
 
 const VolumeChart = ({ data }) => {
   const chartContainerRef = useRef(null);
@@ -14,7 +14,7 @@ const VolumeChart = ({ data }) => {
       }
     };
 
-    const chart = createChart(chartContainerRef.current, {
+    const chart = LightweightCharts.createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
       height: 150,
       layout: {
@@ -35,13 +35,22 @@ const VolumeChart = ({ data }) => {
       }
     });
 
-    const volumeSeries = chart.addHistogramSeries({
-      color: '#38bdf8',
-      priceFormat: {
-        type: 'volume',
-      },
-      priceScaleId: '', // set as an overlay by setting a blank priceScaleId
-    });
+    // const volumeSeries = chart.addHistogramSeries({
+    //   color: '#38bdf8',
+    //   priceFormat: {
+    //     type: 'volume',
+    //   },
+    //   priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+    // });
+
+    const volumeSeries = chart.addSeries(
+      LightweightCharts.HistogramSeries,
+      {
+        color: '#38bdf8',
+        priceFormat: { type: 'volume' },
+        priceScaleId: '',
+      }
+    );
 
     volumeSeries.priceScale().applyOptions({
       scaleMargins: {

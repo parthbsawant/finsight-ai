@@ -35,13 +35,24 @@ const CandlestickChart = ({ data }) => {
       }
     });
 
-    const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#10b981',
-      downColor: '#ef4444',
-      borderVisible: false,
-      wickUpColor: '#10b981',
-      wickDownColor: '#ef4444',
-    });
+    // const candlestickSeries = chart.addCandlestickSeries({
+    //   upColor: '#10b981',
+    //   downColor: '#ef4444',
+    //   borderVisible: false,
+    //   wickUpColor: '#10b981',
+    //   wickDownColor: '#ef4444',
+    // });
+
+    const candlestickSeries = chart.addSeries(
+      LightweightCharts.CandlestickSeries,
+      {
+        upColor: '#10b981',
+        downColor: '#ef4444',
+        borderVisible: false,
+        wickUpColor: '#10b981',
+        wickDownColor: '#ef4444',
+      }
+    );
 
     // Format data: lightweight-charts expects { time, open, high, low, close }
     const formattedData = data.map(item => ({
