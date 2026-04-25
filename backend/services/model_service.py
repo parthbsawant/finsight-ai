@@ -1,6 +1,8 @@
 import joblib
 import os
-from config import Config
+# from config import Config
+from backend.config import Config
+
 
 MODEL_CACHE = {}
 

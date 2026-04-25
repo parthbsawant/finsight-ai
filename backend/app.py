@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
-from config import Config
+# from config import Config
+from backend.config import Config
 from models.db_models import db
 
 from routes.stock_routes import stock_bp

@@ -1,6 +1,8 @@
 import pandas as pd
 import os
-from config import Config
+# from config import Config
+from backend.config import Config
+
 
 def get_stock_data(symbol):
     path = os.path.join(Config.DATA_PATH, f"{symbol}.csv")
