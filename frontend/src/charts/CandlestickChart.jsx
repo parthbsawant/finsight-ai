@@ -19,24 +19,28 @@ const CandlestickChart = ({ data }) => {
       height: 400,
       layout: {
         background: { type: 'solid', color: 'transparent' },
-        textColor: '#d1d5db',
+        textColor: '#64748b',
       },
       grid: {
-        vertLines: { color: '#2e2e2e' },
-        horzLines: { color: '#2e2e2e' },
+        vertLines: { color: '#f1f5f9' },
+        horzLines: { color: '#f1f5f9' },
       },
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        borderColor: '#e2e8f0',
       },
+      rightPriceScale: {
+        borderColor: '#e2e8f0',
+      }
     });
 
     const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#00b852',
-      downColor: '#ff4a4a',
+      upColor: '#10b981',
+      downColor: '#ef4444',
       borderVisible: false,
-      wickUpColor: '#00b852',
-      wickDownColor: '#ff4a4a',
+      wickUpColor: '#10b981',
+      wickDownColor: '#ef4444',
     });
 
     // Format data: lightweight-charts expects { time, open, high, low, close }

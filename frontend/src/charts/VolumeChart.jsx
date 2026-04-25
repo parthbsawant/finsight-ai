@@ -19,20 +19,24 @@ const VolumeChart = ({ data }) => {
       height: 150,
       layout: {
         background: { type: 'solid', color: 'transparent' },
-        textColor: '#d1d5db',
+        textColor: '#64748b',
       },
       grid: {
-        vertLines: { color: '#2e2e2e' },
-        horzLines: { color: '#2e2e2e' },
+        vertLines: { color: '#f1f5f9' },
+        horzLines: { color: '#f1f5f9' },
       },
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        borderColor: '#e2e8f0',
       },
+      rightPriceScale: {
+        borderColor: '#e2e8f0',
+      }
     });
 
     const volumeSeries = chart.addHistogramSeries({
-      color: '#26a69a',
+      color: '#38bdf8',
       priceFormat: {
         type: 'volume',
       },
@@ -50,7 +54,7 @@ const VolumeChart = ({ data }) => {
     const formattedData = data.map(item => ({
       time: new Date(item.date).getTime() / 1000,
       value: item.volume,
-      color: item.close > item.open ? '#00b85280' : '#ff4a4a80'
+      color: item.close > item.open ? '#10b98180' : '#ef444480'
     })).sort((a, b) => a.time - b.time);
 
     volumeSeries.setData(formattedData);

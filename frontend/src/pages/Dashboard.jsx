@@ -3,7 +3,7 @@ import { api } from '../api/api';
 import Card from '../components/Card';
 import Loader from '../components/Loader';
 import Error from '../components/Error';
-import { ArrowUpRight, ArrowDownRight, Activity, Zap, Shield, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Activity, Zap, Shield, ChevronRight, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -30,142 +30,117 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-100 tracking-tight">AI Stock Predictor</h1>
-          <p className="text-gray-400 mt-1">Get real-time AI-powered predictions for your favorite stocks.</p>
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="flex flex-col items-center justify-center text-center py-8">
+        <h1 className="text-4xl font-bold text-light-textMain tracking-tight mb-3">AI Stock Predictor</h1>
+        <p className="text-light-textMuted max-w-xl text-lg">Get real-time AI-powered predictions for your favorite stocks using advanced technical indicators.</p>
+        
+        <form onSubmit={handlePredict} className="mt-8 w-full max-w-2xl flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative w-full">
+            <input
+              id="symbol"
+              type="text"
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+              placeholder="Enter symbol (e.g., AAPL, TSLA)"
+              className="w-full bg-white border border-light-border rounded-xl pl-12 pr-4 py-4 text-lg text-light-textMain placeholder-slate-400 focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 transition-all uppercase shadow-sm"
+              autoComplete="off"
+            />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-6 w-6 text-slate-400" />
+            </div>
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading || !symbol.trim()}
+            className="w-full sm:w-auto px-8 py-4 bg-brand-blue hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white font-medium rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center space-x-2 whitespace-nowrap"
+          >
+            {loading ? (
+              <span>Analyzing...</span>
+            ) : (
+              <>
+                <Zap size={20} />
+                <span>Predict</span>
+              </>
+            )}
+          </button>
+        </form>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-1 border-t-4 border-t-brand-blue">
-          <form onSubmit={handlePredict} className="flex flex-col h-full justify-between">
-            <div>
-              <label htmlFor="symbol" className="block text-sm font-medium text-gray-300 mb-2">
-                Stock Symbol
-              </label>
-              <div className="relative">
-                <input
-                  id="symbol"
-                  type="text"
-                  value={symbol}
-                  onChange={(e) => setSymbol(e.target.value)}
-                  placeholder="e.g. AAPL, TSLA, GOOG"
-                  className="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all uppercase"
-                  autoComplete="off"
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <SearchIcon className="h-5 w-5 text-gray-500" />
-                </div>
+      <div className="max-w-4xl mx-auto">
+        {loading ? (
+          <Card className="h-full flex items-center justify-center min-h-[300px]">
+            <Loader message="Running ML models and analyzing trends..." />
+          </Card>
+        ) : error ? (
+          <Error message={error} retry={() => handlePredict({ preventDefault: () => {} })} />
+        ) : result ? (
+          <Card className="relative overflow-hidden border-t-4 border-t-brand-blue p-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-light-border pb-6">
+              <div>
+                <h2 className="text-3xl font-bold text-light-textMain flex items-center space-x-3">
+                  <span>{result.symbol}</span>
+                  <span className="text-xs font-semibold text-brand-blue bg-blue-50 px-3 py-1 rounded-full border border-blue-100 uppercase tracking-wide">
+                    Prediction
+                  </span>
+                </h2>
               </div>
-              <p className="text-xs text-gray-500 mt-3">
-                Enter a valid US stock ticker to get an AI prediction.
-              </p>
+              <button
+                onClick={() => navigate(`/stock/${result.symbol}`)}
+                className="mt-4 md:mt-0 flex items-center px-4 py-2 bg-slate-50 hover:bg-slate-100 text-sm font-medium text-light-textMain border border-light-border rounded-lg transition-colors"
+              >
+                View Full Chart <ChevronRight size={16} className="ml-1" />
+              </button>
             </div>
-            
-            <button
-              type="submit"
-              disabled={loading || !symbol.trim()}
-              className="mt-6 w-full py-3 px-4 bg-brand-blue hover:bg-brand-blue/90 disabled:bg-brand-blue/50 disabled:cursor-not-allowed text-white font-medium rounded-lg shadow-lg shadow-brand-blue/20 transition-all active:scale-[0.98] flex items-center justify-center space-x-2"
-            >
-              {loading ? (
-                <span>Analyzing...</span>
-              ) : (
-                <>
-                  <span>Get Prediction</span>
-                  <Zap size={18} />
-                </>
-              )}
-            </button>
-          </form>
-        </Card>
 
-        <div className="lg:col-span-2">
-          {loading ? (
-            <Card className="h-full flex items-center justify-center min-h-[300px]">
-              <Loader message="Running ML models..." />
-            </Card>
-          ) : error ? (
-            <Error message={error} retry={() => handlePredict({ preventDefault: () => {} })} />
-          ) : result ? (
-            <Card className="h-full relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-white/5 to-transparent rounded-full blur-2xl pointer-events-none"></div>
-              
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-100 flex items-center space-x-2">
-                    <span>{result.symbol}</span>
-                    <span className="text-sm font-normal text-gray-400 px-2 py-1 bg-dark-bg rounded-md border border-dark-border">
-                      Prediction Result
-                    </span>
-                  </h2>
-                </div>
-                <button
-                  onClick={() => navigate(`/stock/${result.symbol}`)}
-                  className="flex items-center text-sm text-brand-blue hover:text-brand-blue/80 transition-colors"
-                >
-                  View Chart <ChevronRight size={16} />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className={`p-4 rounded-xl border ${result.prediction === 'UP' ? 'bg-brand-green/10 border-brand-green/20' : 'bg-brand-red/10 border-brand-red/20'} flex flex-col items-center justify-center`}>
-                  <p className="text-sm text-gray-400 mb-1">Signal</p>
-                  <div className={`flex items-center space-x-2 ${result.prediction === 'UP' ? 'text-brand-green' : 'text-brand-red'}`}>
-                    {result.prediction === 'UP' ? <ArrowUpRight size={28} /> : <ArrowDownRight size={28} />}
-                    <span className="text-3xl font-bold">{result.prediction}</span>
-                  </div>
-                </div>
-                <div className="p-4 rounded-xl border bg-dark-bg border-dark-border flex flex-col items-center justify-center">
-                  <p className="text-sm text-gray-400 mb-1">Confidence</p>
-                  <div className="flex items-center space-x-2 text-brand-blue">
-                    <Shield size={24} />
-                    <span className="text-3xl font-bold">{result.confidence}%</span>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className={`p-6 rounded-2xl border flex flex-col items-center justify-center ${
+                  result.prediction === 'UP' 
+                  ? 'bg-emerald-50 border-emerald-100 text-brand-green' 
+                  : 'bg-red-50 border-red-100 text-brand-red'
+              }`}>
+                <p className="text-sm font-semibold uppercase tracking-wider opacity-80 mb-2">AI Signal</p>
+                <div className="flex items-center space-x-3">
+                  {result.prediction === 'UP' ? <ArrowUpRight size={40} /> : <ArrowDownRight size={40} />}
+                  <span className="text-5xl font-black">{result.prediction}</span>
                 </div>
               </div>
 
-              {result.explanation && result.explanation.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center space-x-2">
-                    <Activity size={16} className="text-brand-blue" />
-                    <span>Key Factors</span>
-                  </h3>
-                  <ul className="space-y-2">
-                    {result.explanation.map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-2 text-sm text-gray-400">
-                        <span className="text-brand-blue mt-0.5">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+              <div className="p-6 rounded-2xl border bg-slate-50 border-light-border flex flex-col items-center justify-center">
+                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Model Confidence</p>
+                <div className="flex items-center space-x-3 text-light-textMain">
+                  <Shield size={32} className="text-brand-blue" />
+                  <span className="text-5xl font-black">{Number(result.confidence).toFixed(1)}%</span>
                 </div>
-              )}
-            </Card>
-          ) : (
-            <Card className="h-full flex flex-col items-center justify-center min-h-[300px] text-center p-8 border-dashed border-2 border-dark-border bg-transparent">
-              <div className="w-16 h-16 rounded-full bg-dark-surface flex items-center justify-center mb-4">
-                <Activity className="w-8 h-8 text-gray-500" />
               </div>
-              <h3 className="text-lg font-medium text-gray-300 mb-2">Ready to Analyze</h3>
-              <p className="text-sm text-gray-500 max-w-sm">
-                Enter a stock symbol to generate an AI-powered prediction based on technical indicators and market trends.
-              </p>
-            </Card>
-          )}
-        </div>
+            </div>
+
+            {result.explanation && result.explanation.length > 0 && (
+              <div className="bg-slate-50 rounded-xl p-6 border border-light-border">
+                <h3 className="text-base font-semibold text-light-textMain mb-4 flex items-center space-x-2">
+                  <Activity size={18} className="text-brand-blue" />
+                  <span>Key Technical Factors</span>
+                </h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {result.explanation.map((item, idx) => (
+                    <li key={idx} className="flex items-start space-x-3 text-sm text-light-textMuted bg-white p-3 rounded-lg border border-light-border">
+                      <span className="text-brand-blue mt-0.5 flex-shrink-0">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </Card>
+        ) : (
+          <div className="hidden">
+            {/* Empty state is handled by the main hero section */}
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-// Simple search icon for the input
-const SearchIcon = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <circle cx="11" cy="11" r="8"></circle>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-  </svg>
-);
 
 export default Dashboard;
