@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from models.db_models import Prediction, db
 from sqlalchemy import func
+from services.db_service import get_basic_analytics
 
 analytics_bp = Blueprint("analytics", __name__)
 
@@ -13,9 +14,11 @@ def get_analytics():
 
     avg_confidence = db.session.query(func.avg(Prediction.confidence)).scalar()
 
-    return jsonify({
-        "total_predictions": total,
-        "up_predictions": up_count,
-        "down_predictions": down_count,
-        "avg_confidence": round(avg_confidence, 4) if avg_confidence else 0
-    })
+    # return jsonify({
+    #     "total_predictions": total,
+    #     "up_predictions": up_count,
+    #     "down_predictions": down_count,
+    #     "avg_confidence": round(avg_confidence, 4) if avg_confidence else 0
+    # })
+
+    return jsonify(get_basic_analytics())

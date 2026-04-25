@@ -1,6 +1,11 @@
 from flask import Blueprint, jsonify
 from models.db_models import Prediction, db
 from sqlalchemy import func
+from services.db_service import (
+    get_stock_analytics,
+    get_trends,
+    get_recent
+)
 
 advanced_analytics_bp = Blueprint("advanced_analytics", __name__)
 
@@ -36,14 +41,16 @@ def stock_analytics(symbol):
         Prediction.created_at.desc()
     ).first()
 
-    return jsonify({
-        "symbol": symbol,
-        "total_predictions": total,
-        "up_predictions": up_count,
-        "down_predictions": down_count,
-        "avg_confidence": round(avg_confidence, 4) if avg_confidence else 0,
-        "latest_prediction": latest.to_dict() if latest else None
-    })
+    # return jsonify({
+    #     "symbol": symbol,
+    #     "total_predictions": total,
+    #     "up_predictions": up_count,
+    #     "down_predictions": down_count,
+    #     "avg_confidence": round(avg_confidence, 4) if avg_confidence else 0,
+    #     "latest_prediction": latest.to_dict() if latest else None
+    # })
+
+    return jsonify(get_stock_analytics(symbol.upper()))
 
 
 @advanced_analytics_bp.route("/analytics/trends", methods=["GET"])
@@ -67,16 +74,22 @@ def prediction_trends():
             "count": row.count
         })
 
-    return jsonify({
-        "data": data
-    })
-
+    # return jsonify({
+    #     "data": data
+    # })
+    return jsonify({"data": get_trends()})
 
 @advanced_analytics_bp.route("/analytics/recent", methods=["GET"])
 def recent_predictions():
     records = Prediction.query.order_by(Prediction.created_at.desc()).limit(10).all()
 
+    # return jsonify({
+    #     "count": len(records),
+    #     "data": [r.to_dict() for r in records]
+    # })
+    data = get_recent()
+
     return jsonify({
-        "count": len(records),
-        "data": [r.to_dict() for r in records]
+        "count": len(data),
+        "data": data
     })

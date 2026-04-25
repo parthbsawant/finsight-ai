@@ -6,6 +6,7 @@ from services.model_service import load_model, predict
 from services.explain_service import generate_explanation
 
 from models.db_models import db, Prediction
+from services.db_service import save_prediction
 
 prediction_bp = Blueprint("prediction", __name__)
 
@@ -43,8 +44,14 @@ def predict_stock(symbol):
         news_count=int(X["news_count"].iloc[0]) if "news_count" in X.columns else None,
     )
 
-    db.session.add(record)
-    db.session.commit()
+    # db.session.add(record)
+    # db.session.commit()
+    record = save_prediction(
+    symbol,
+    "UP" if pred == 1 else "DOWN",
+    float(max(model.predict_proba(X)[0])),
+    X.iloc[0]
+    )
 
     return jsonify({
         "symbol": symbol,
