@@ -7,16 +7,30 @@ import Error from '../components/Error';
 import { CardSkeleton, ChartSkeleton } from '../components/Skeleton';
 import CandlestickChart from '../charts/CandlestickChart';
 import VolumeChart from '../charts/VolumeChart';
+import SimulationControls from '../components/SimulationControls';
 import { parseCSV } from '../utils/csvParser';
+import { aggregateData } from '../utils/timeframeUtils';
 import { api } from '../api/api';
 
 const StockDetail = () => {
   const { symbol } = useParams();
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  
+  // Data States
+  const [baseData, setBaseData] = useState([]); // Raw CSV data
+  const [fullData, setFullData] = useState([]); // Aggregated data based on timeframe
+  const [visibleData, setVisibleData] = useState([]); // Data currently on chart
+  const [analytics, setAnalytics] = useState(null);
+  
+  // UI States
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [analytics, setAnalytics] = useState(null);
+  
+  // Simulation States
+  const [currentIndex, setCurrentIndex] = useState(50);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [speed, setSpeed] = useState(1000); 
+  const [timeframe, setTimeframe] = useState('1D');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +43,7 @@ const StockDetail = () => {
         }
         
         const validData = csvData.filter(row => row.date && row.close);
-        setData(validData);
+        setBaseData(validData);
 
         try {
           const stats = await api.getStockAnalytics(symbol);
@@ -48,8 +62,61 @@ const StockDetail = () => {
     fetchData();
   }, [symbol]);
 
-  const latestData = data.length > 0 ? data[data.length - 1] : null;
-  const previousData = data.length > 1 ? data[data.length - 2] : null;
+  // Handle Timeframe Switching
+  useEffect(() => {
+    if (baseData.length === 0) return;
+    
+    const aggregated = aggregateData(baseData, timeframe);
+    setFullData(aggregated);
+    
+    const startIdx = Math.min(50, aggregated.length);
+    setCurrentIndex(startIdx);
+    setVisibleData(aggregated.slice(0, startIdx));
+  }, [timeframe, baseData]);
+
+  // Simulation Loop
+  useEffect(() => {
+    if (!isPlaying || fullData.length === 0) return;
+
+    const intervalId = setInterval(() => {
+      setCurrentIndex(prevIndex => {
+        const nextIndex = prevIndex + 1;
+        if (nextIndex > fullData.length) {
+          return prevIndex; // Stop at end
+        }
+        return nextIndex;
+      });
+    }, speed);
+
+    return () => clearInterval(intervalId);
+  }, [isPlaying, speed, fullData]);
+
+  // Sync visible data when index changes
+  useEffect(() => {
+    if (fullData.length > 0) {
+      setVisibleData(fullData.slice(0, currentIndex));
+      if (currentIndex >= fullData.length) {
+        setIsPlaying(false);
+      }
+    }
+  }, [currentIndex, fullData]);
+
+  // Control Handlers
+  const handleRestart = () => {
+    const startIdx = Math.min(50, fullData.length);
+    setCurrentIndex(startIdx);
+  };
+
+  const handleForward = () => {
+    setCurrentIndex(prev => Math.min(fullData.length, prev + 10));
+  };
+
+  const handleBackward = () => {
+    setCurrentIndex(prev => Math.max(Math.min(50, fullData.length), prev - 10));
+  };
+
+  const latestData = visibleData.length > 0 ? visibleData[visibleData.length - 1] : null;
+  const previousData = visibleData.length > 1 ? visibleData[visibleData.length - 2] : null;
   
   const priceChange = latestData && previousData ? latestData.close - previousData.close : 0;
   const priceChangePercent = latestData && previousData ? (priceChange / previousData.close) * 100 : 0;
@@ -113,6 +180,20 @@ const StockDetail = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3 space-y-4">
+          
+          {/* Simulation Controls Component */}
+          <SimulationControls 
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+            speed={speed}
+            setSpeed={setSpeed}
+            timeframe={timeframe}
+            setTimeframe={setTimeframe}
+            onRestart={handleRestart}
+            onBackward={handleBackward}
+            onForward={handleForward}
+          />
+
           <Card className="p-4 shadow-sm border-t-4 border-t-brand-blue">
             <div className="flex flex-wrap space-x-6 text-sm mb-4 px-2 pb-4 border-b border-light-border bg-slate-50 p-3 rounded-lg">
               <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">Open</span><span className="text-light-textMain font-bold">${Number(latestData?.open || 0).toFixed(2)}</span></div>
@@ -121,17 +202,18 @@ const StockDetail = () => {
             </div>
 
             <div className="border border-light-border rounded-lg overflow-hidden bg-white mb-4">
-              <CandlestickChart data={data} />
+              <CandlestickChart data={visibleData} />
             </div>
             
             <div className="border border-light-border rounded-lg overflow-hidden bg-white">
-              <VolumeChart data={data} />
+              <VolumeChart data={visibleData} />
             </div>
           </Card>
         </div>
 
         <div className="space-y-6">
-          <Card title="Technical Indicators" className="shadow-sm">
+          <Card title="Technical Indicators" className="shadow-sm mt-[88px] lg:mt-0">
+            {/* The margin top helps align with the chart when simulation controls are present */}
             <div className="space-y-0 divide-y divide-light-border">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center space-x-2 text-light-textMuted">

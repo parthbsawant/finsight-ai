@@ -4,10 +4,11 @@ import { createChart, CandlestickSeries, CrosshairMode } from 'lightweight-chart
 const CandlestickChart = ({ data }) => {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
+  const seriesRef = useRef(null);
   const [chartError, setChartError] = useState(null);
 
+  // Initialize chart only once
   useEffect(() => {
-    if (!data || data.length === 0) return;
     if (!chartContainerRef.current) return;
 
     let chart;
@@ -68,6 +69,30 @@ const CandlestickChart = ({ data }) => {
         wickDownColor: '#ef4444',
       });
 
+      chartRef.current = chart;
+      seriesRef.current = candlestickSeries;
+      window.addEventListener('resize', handleResize);
+
+    } catch (err) {
+      console.error("Candlestick Chart Init Error:", err);
+      setChartError(err.message);
+    }
+
+    return () => {
+      if (handleResize) window.removeEventListener('resize', handleResize);
+      if (chart) {
+        chart.remove();
+        chartRef.current = null;
+        seriesRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update data smoothly
+  useEffect(() => {
+    if (!seriesRef.current || !chartRef.current || !data || data.length === 0) return;
+
+    try {
       const formattedData = data.map(item => ({
         time: Math.floor(new Date(item.date).getTime() / 1000),
         open: Number(item.open) || 0,
@@ -79,22 +104,14 @@ const CandlestickChart = ({ data }) => {
       const uniqueData = formattedData.filter((v, i, a) => a.findIndex(t => (t.time === v.time)) === i);
 
       if (uniqueData.length > 0) {
-        candlestickSeries.setData(uniqueData);
-        chart.timeScale().fitContent();
+        seriesRef.current.setData(uniqueData);
+        // Force scroll to latest candle for real-time tracking
+        chartRef.current.timeScale().scrollToRealTime();
       }
-
-      chartRef.current = chart;
-      window.addEventListener('resize', handleResize);
-
     } catch (err) {
-      console.error("Candlestick Chart Error:", err);
+      console.error("Candlestick Chart Update Error:", err);
       setChartError(err.message);
     }
-
-    return () => {
-      if (handleResize) window.removeEventListener('resize', handleResize);
-      if (chart) chart.remove();
-    };
   }, [data]);
 
   if (chartError) {
@@ -103,10 +120,6 @@ const CandlestickChart = ({ data }) => {
         Chart Error: {chartError}
       </div>
     );
-  }
-
-  if (!data || data.length === 0) {
-    return <div className="w-full h-[400px] flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-200 rounded-lg">Loading chart data...</div>;
   }
 
   return <div ref={chartContainerRef} className="w-full h-[400px]" />;

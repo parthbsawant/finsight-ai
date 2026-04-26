@@ -4,10 +4,10 @@ import { createChart, HistogramSeries, CrosshairMode } from 'lightweight-charts'
 const VolumeChart = ({ data }) => {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
+  const seriesRef = useRef(null);
   const [chartError, setChartError] = useState(null);
 
   useEffect(() => {
-    if (!data || data.length === 0) return;
     if (!chartContainerRef.current) return;
 
     let chart;
@@ -73,31 +73,45 @@ const VolumeChart = ({ data }) => {
         },
       });
 
-      const formattedData = data.map(item => ({
-        time: Math.floor(new Date(item.date).getTime() / 1000),
-        value: Number(item.volume) || 0,
-        color: Number(item.close) > Number(item.open) ? '#10b981' : '#ef4444' // Avoid 8-digit hex just in case
-      })).filter(d => !isNaN(d.time)).sort((a, b) => a.time - b.time);
-
-      const uniqueData = formattedData.filter((v, i, a) => a.findIndex(t => (t.time === v.time)) === i);
-
-      if (uniqueData.length > 0) {
-        volumeSeries.setData(uniqueData);
-        chart.timeScale().fitContent();
-      }
-      
       chartRef.current = chart;
+      seriesRef.current = volumeSeries;
       window.addEventListener('resize', handleResize);
 
     } catch (err) {
-      console.error("Volume Chart Error:", err);
+      console.error("Volume Chart Init Error:", err);
       setChartError(err.message);
     }
 
     return () => {
       if (handleResize) window.removeEventListener('resize', handleResize);
-      if (chart) chart.remove();
+      if (chart) {
+        chart.remove();
+        chartRef.current = null;
+        seriesRef.current = null;
+      }
     };
+  }, []);
+
+  useEffect(() => {
+    if (!seriesRef.current || !chartRef.current || !data || data.length === 0) return;
+
+    try {
+      const formattedData = data.map(item => ({
+        time: Math.floor(new Date(item.date).getTime() / 1000),
+        value: Number(item.volume) || 0,
+        color: Number(item.close) > Number(item.open) ? '#10b981' : '#ef4444' 
+      })).filter(d => !isNaN(d.time)).sort((a, b) => a.time - b.time);
+
+      const uniqueData = formattedData.filter((v, i, a) => a.findIndex(t => (t.time === v.time)) === i);
+
+      if (uniqueData.length > 0) {
+        seriesRef.current.setData(uniqueData);
+        chartRef.current.timeScale().scrollToRealTime();
+      }
+    } catch (err) {
+      console.error("Volume Chart Update Error:", err);
+      setChartError(err.message);
+    }
   }, [data]);
 
   if (chartError) {
@@ -106,10 +120,6 @@ const VolumeChart = ({ data }) => {
         Chart Error: {chartError}
       </div>
     );
-  }
-
-  if (!data || data.length === 0) {
-    return <div className="w-full h-[150px] flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-200 rounded-lg">Loading volume data...</div>;
   }
 
   return <div ref={chartContainerRef} className="w-full h-[150px]" />;
