@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart } from 'lightweight-charts';
+import { createChart, HistogramSeries, CrosshairMode } from 'lightweight-charts';
 
 const VolumeChart = ({ data }) => {
   const chartContainerRef = useRef(null);
@@ -24,24 +24,43 @@ const VolumeChart = ({ data }) => {
         width: chartContainerRef.current.clientWidth,
         height: 150,
         layout: {
-          background: { type: 'solid', color: 'transparent' },
-          textColor: '#64748b',
+          background: { type: 'solid', color: '#ffffff' },
+          textColor: '#334155',
         },
         grid: {
-          vertLines: { color: '#f1f5f9' },
-          horzLines: { color: '#f1f5f9' },
+          vertLines: { color: '#f1f5f9', style: 1 },
+          horzLines: { color: '#f1f5f9', style: 1 },
+        },
+        crosshair: {
+          mode: CrosshairMode.Normal,
+          vertLine: {
+            width: 1,
+            color: '#94a3b8',
+            style: 3,
+            labelBackgroundColor: '#334155',
+          },
+          horzLine: {
+            width: 1,
+            color: '#94a3b8',
+            style: 3,
+            labelBackgroundColor: '#334155',
+          },
         },
         timeScale: {
           timeVisible: true,
           secondsVisible: false,
           borderColor: '#e2e8f0',
+          rightOffset: 10,
+          barSpacing: 12,
+          fixLeftEdge: true,
         },
         rightPriceScale: {
           borderColor: '#e2e8f0',
+          autoScale: true,
         }
       });
 
-      const volumeSeries = chart.addHistogramSeries({
+      const volumeSeries = chart.addSeries(HistogramSeries, {
         color: '#38bdf8',
         priceFormat: { type: 'volume' },
         priceScaleId: '',
