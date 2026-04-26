@@ -98,7 +98,7 @@ const StockDetail = () => {
         <div className="flex items-end justify-between sm:justify-end sm:space-x-8 w-full sm:w-auto bg-white p-4 sm:p-0 rounded-xl sm:rounded-none sm:bg-transparent border sm:border-transparent border-light-border shadow-sm sm:shadow-none">
           <div>
             <p className="text-3xl font-bold text-light-textMain flex items-center space-x-3">
-              <span>${latestData?.close?.toFixed(2)}</span>
+              <span>${Number(latestData?.close || 0).toFixed(2)}</span>
             </p>
           </div>
           <div className="text-right">
@@ -115,9 +115,9 @@ const StockDetail = () => {
         <div className="lg:col-span-3 space-y-4">
           <Card className="p-4 shadow-sm border-t-4 border-t-brand-blue">
             <div className="flex flex-wrap space-x-6 text-sm mb-4 px-2 pb-4 border-b border-light-border bg-slate-50 p-3 rounded-lg">
-              <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">Open</span><span className="text-light-textMain font-bold">${latestData?.open?.toFixed(2)}</span></div>
-              <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">High</span><span className="text-light-textMain font-bold">${latestData?.high?.toFixed(2)}</span></div>
-              <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">Low</span><span className="text-light-textMain font-bold">${latestData?.low?.toFixed(2)}</span></div>
+              <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">Open</span><span className="text-light-textMain font-bold">${Number(latestData?.open || 0).toFixed(2)}</span></div>
+              <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">High</span><span className="text-light-textMain font-bold">${Number(latestData?.high || 0).toFixed(2)}</span></div>
+              <div className="flex flex-col"><span className="text-light-textMuted text-xs font-semibold uppercase">Low</span><span className="text-light-textMain font-bold">${Number(latestData?.low || 0).toFixed(2)}</span></div>
             </div>
 
             <div className="border border-light-border rounded-lg overflow-hidden bg-white mb-4">
@@ -139,7 +139,7 @@ const StockDetail = () => {
                   <span className="font-medium">RSI (14)</span>
                 </div>
                 <span className={`font-bold ${latestData?.rsi > 70 ? 'text-brand-red' : latestData?.rsi < 30 ? 'text-brand-green' : 'text-light-textMain'}`}>
-                  {latestData?.rsi ? latestData.rsi.toFixed(2) : 'N/A'}
+                  {latestData?.rsi ? Number(latestData.rsi).toFixed(2) : 'N/A'}
                 </span>
               </div>
               <div className="flex justify-between items-center py-4">
@@ -148,13 +148,13 @@ const StockDetail = () => {
                   <span className="font-medium">Volume</span>
                 </div>
                 <span className="font-bold text-light-textMain">
-                  {latestData?.volume ? (latestData.volume / 1000000).toFixed(2) + 'M' : 'N/A'}
+                  {latestData?.volume ? (Number(latestData.volume) / 1000000).toFixed(2) + 'M' : 'N/A'}
                 </span>
               </div>
               <div className="flex justify-between items-center py-4">
                 <span className="text-light-textMuted font-medium">Volatility</span>
                 <span className="font-bold text-light-textMain bg-slate-100 px-2 py-1 rounded">
-                  {latestData?.volatility ? latestData.volatility.toFixed(4) : 'N/A'}
+                  {latestData?.volatility ? Number(latestData.volatility).toFixed(4) : 'N/A'}
                 </span>
               </div>
             </div>

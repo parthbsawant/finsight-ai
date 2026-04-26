@@ -1,78 +1,94 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createChart } from 'lightweight-charts';
 
 const CandlestickChart = ({ data }) => {
   const chartContainerRef = useRef(null);
   const chartRef = useRef(null);
+  const [chartError, setChartError] = useState(null);
 
   useEffect(() => {
+    if (!data || data.length === 0) return;
     if (!chartContainerRef.current) return;
 
-    const handleResize = () => {
-      if (chartRef.current) {
-        chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
-      }
-    };
+    let chart;
+    let handleResize;
 
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: 400,
-      layout: {
-        background: { type: 'solid', color: 'transparent' },
-        textColor: '#64748b',
-      },
-      grid: {
-        vertLines: { color: '#f1f5f9' },
-        horzLines: { color: '#f1f5f9' },
-      },
-      timeScale: {
-        timeVisible: true,
-        secondsVisible: false,
-        borderColor: '#e2e8f0',
-      },
-      rightPriceScale: {
-        borderColor: '#e2e8f0',
-      }
-    });
+    try {
+      handleResize = () => {
+        if (chartRef.current && chartContainerRef.current) {
+          chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
+        }
+      };
 
-    // const candlestickSeries = chart.addCandlestickSeries({
-    //   upColor: '#10b981',
-    //   downColor: '#ef4444',
-    //   borderVisible: false,
-    //   wickUpColor: '#10b981',
-    //   wickDownColor: '#ef4444',
-    // });
+      chart = createChart(chartContainerRef.current, {
+        width: chartContainerRef.current.clientWidth,
+        height: 400,
+        layout: {
+          background: { type: 'solid', color: 'transparent' },
+          textColor: '#64748b',
+        },
+        grid: {
+          vertLines: { color: '#f1f5f9' },
+          horzLines: { color: '#f1f5f9' },
+        },
+        timeScale: {
+          timeVisible: true,
+          secondsVisible: false,
+          borderColor: '#e2e8f0',
+        },
+        rightPriceScale: {
+          borderColor: '#e2e8f0',
+        }
+      });
 
-    const candlestickSeries = chart.addSeries(
-      LightweightCharts.CandlestickSeries,
-      {
+      const candlestickSeries = chart.addCandlestickSeries({
         upColor: '#10b981',
         downColor: '#ef4444',
         borderVisible: false,
         wickUpColor: '#10b981',
         wickDownColor: '#ef4444',
+      });
+
+      const formattedData = data.map(item => ({
+        time: Math.floor(new Date(item.date).getTime() / 1000),
+        open: Number(item.open) || 0,
+        high: Number(item.high) || 0,
+        low: Number(item.low) || 0,
+        close: Number(item.close) || 0,
+      })).filter(d => !isNaN(d.time)).sort((a, b) => a.time - b.time);
+
+      const uniqueData = formattedData.filter((v, i, a) => a.findIndex(t => (t.time === v.time)) === i);
+
+      if (uniqueData.length > 0) {
+        candlestickSeries.setData(uniqueData);
+        chart.timeScale().fitContent();
       }
-    );
 
-    // Format data: lightweight-charts expects { time, open, high, low, close }
-    const formattedData = data.map(item => ({
-      time: new Date(item.date).getTime() / 1000,
-      open: item.open,
-      high: item.high,
-      low: item.low,
-      close: item.close,
-    })).sort((a, b) => a.time - b.time);
+      chartRef.current = chart;
+      window.addEventListener('resize', handleResize);
 
-    candlestickSeries.setData(formattedData);
-    chartRef.current = chart;
-
-    window.addEventListener('resize', handleResize);
+    } catch (err) {
+      console.error("Candlestick Chart Error:", err);
+      setChartError(err.message);
+    }
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
+      if (handleResize) window.removeEventListener('resize', handleResize);
+      if (chart) chart.remove();
     };
   }, [data]);
+
+  if (chartError) {
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-red-50 text-red-500 border border-red-200 rounded-lg p-4 text-center">
+        Chart Error: {chartError}
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return <div className="w-full h-[400px] flex items-center justify-center text-slate-400 bg-slate-50 border border-slate-200 rounded-lg">Loading chart data...</div>;
+  }
 
   return <div ref={chartContainerRef} className="w-full h-[400px]" />;
 };
